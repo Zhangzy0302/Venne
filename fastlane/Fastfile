@@ -137,7 +137,7 @@ platform :ios do
     update_code_signing_settings(
       path: "Venne.xcodeproj",
       use_automatic_signing: false,
-      team_id: "WLLMWYMP66",
+      team_id: "NA4S7J6745",
       targets: ["Venne"],
       code_sign_identity: "Apple Distribution",
       profile_name: "match AppStore com.venaixveribxcw.Venne",
