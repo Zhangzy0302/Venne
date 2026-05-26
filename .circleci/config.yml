@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   build-and-upload:
     macos:
-      xcode: "26.4.1" #自己当前Xcode版本
+      xcode: "26.2" #自己当前Xcode版本
 
     environment:
       BUNDLE_PATH: vendor/bundle # Bundler 安装路径，方便缓存
