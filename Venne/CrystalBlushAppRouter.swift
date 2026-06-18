@@ -34,6 +34,7 @@ enum CrystalBlushAppRoute: Hashable {
 
     case crystalBlushEventGroupChat(roomID: String)
     case honeyLuxePrivateChatRoom(roomID: String)
+    case pearlLuxeVideoCall(roomID: String)
 
     case moonPetalUserProfile(userID: String)
     case rougeRibbonReport(targetUserID: String)
@@ -97,11 +98,37 @@ enum CrystalBlushAppRoute: Hashable {
             CrystalBlushEventGroupChatView(crystalBlushRoomID: roomID)
         case .honeyLuxePrivateChatRoom(let roomID):
             HoneyLuxePrivateChatRoomView(honeyLuxeRoomID: roomID)
+        case .pearlLuxeVideoCall(let roomID):
+            PearlLuxeVideoCallView(pearlLuxeRoomID: roomID)
         case .moonPetalUserProfile(let userID):
             MoonPetalUserProfileView(moonPetalUserID: userID)
         case .rougeRibbonReport(let targetUserID):
             RougeRibbonReportView(rougeRibbonTargetUserID: targetUserID)
         }
+    }
+
+    var crystalBlushAllowsSwipeBack: Bool {
+        switch self {
+        case .honeyLuxeWebDisplay(let webAddress):
+            return CrystalBlushAppRoute.crystalBlushIsBPackageWebAddress(webAddress) == false
+        default:
+            return true
+        }
+    }
+
+    private static func crystalBlushIsBPackageWebAddress(_ crystalBlushWebAddress: String) -> Bool {
+        let crystalBlushTrimmedAddress = crystalBlushWebAddress.trimmingCharacters(in: .whitespacesAndNewlines)
+        let crystalBlushResolvedAddress: String
+
+        if let crystalBlushURL = URL(string: crystalBlushTrimmedAddress),
+           crystalBlushURL.scheme?.isEmpty == false {
+            crystalBlushResolvedAddress = crystalBlushURL.absoluteString
+        } else {
+            crystalBlushResolvedAddress = "https://\(crystalBlushTrimmedAddress)"
+        }
+
+        return crystalBlushResolvedAddress.contains("openParams=")
+            || crystalBlushResolvedAddress.contains("appId=")
     }
 }
 
@@ -122,6 +149,10 @@ final class CrystalBlushAppRouter: ObservableObject {
 
     var crystalBlushCanPop: Bool {
         !crystalBlushRoutePath.isEmpty
+    }
+
+    var crystalBlushCanSwipeBack: Bool {
+        crystalBlushCanPop && crystalBlushCurrentRoute.crystalBlushAllowsSwipeBack
     }
 
     func push(_ crystalBlushRoute: CrystalBlushAppRoute) {

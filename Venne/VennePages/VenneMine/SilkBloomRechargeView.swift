@@ -255,7 +255,9 @@ final class SilkBloomRechargeIAPManager: NSObject, ObservableObject {
     @Published var silkBloomIsPurchasing = false
 
     private var silkBloomRequest: SKProductsRequest?
-    private var silkBloomPurchaseCompletion: ((SilkBloomRechargePurchaseResult) -> Void)?
+    private var silkBloomProductCache: [String: SKProduct] = [:]
+    private var silkBloomPendingOrderCodes: [String: String] = [:]
+    private var silkBloomPendingCompletions: [String: (SilkBloomRechargePurchaseResult) -> Void] = [:]
     private var silkBloomRetryCount = 0
     private var silkBloomTotalRequestCount = 0
     private let silkBloomMaxTotalRequestCount = 10
@@ -275,7 +277,7 @@ final class SilkBloomRechargeIAPManager: NSObject, ObservableObject {
     func silkBloomFetchProducts() {
         guard silkBloomTotalRequestCount < silkBloomMaxTotalRequestCount else { return }
         guard silkBloomIsRequesting == false else { return }
-        guard silkBloomStoreProducts.isEmpty else { return }
+        guard silkBloomProductCache.isEmpty else { return }
 
         silkBloomIsRequesting = true
         silkBloomTotalRequestCount += 1
@@ -296,16 +298,18 @@ final class SilkBloomRechargeIAPManager: NSObject, ObservableObject {
             return
         }
 
-        guard let silkBloomProduct = silkBloomStoreProducts.first(where: {
-            $0.productIdentifier == silkBloomProductKeyID
-        }) else {
+        guard let silkBloomProduct = silkBloomProductCache[silkBloomProductKeyID] else {
             silkBloomFetchProducts()
-            completion(.failed(message: "Product not found. Please try again later."))
+            completion(.failed(message: "Products are loading."))
             return
         }
 
         silkBloomIsPurchasing = true
-        silkBloomPurchaseCompletion = completion
+        silkBloomPendingCompletions[silkBloomProductKeyID] = completion
+
+        if VelvetPoutAppStorage.velvetPoutIsB {
+            silkBloomPendingOrderCodes[silkBloomProductKeyID] = velvetPoutUsersOrderCode
+        }
 
         let silkBloomPayment = SKPayment(product: silkBloomProduct)
         SKPaymentQueue.default().add(silkBloomPayment)
@@ -317,11 +321,100 @@ final class SilkBloomRechargeIAPManager: NSObject, ObservableObject {
         }
     }
 
-    private func silkBloomFinishPurchase(_ silkBloomResult: SilkBloomRechargePurchaseResult) {
+    private func silkBloomFinishPurchase(
+        productID silkBloomProductID: String,
+        result silkBloomResult: SilkBloomRechargePurchaseResult
+    ) {
+        let silkBloomCompletion = silkBloomPendingCompletions.removeValue(forKey: silkBloomProductID)
+        silkBloomPendingOrderCodes.removeValue(forKey: silkBloomProductID)
+
         DispatchQueue.main.async {
             self.silkBloomIsPurchasing = false
-            self.silkBloomPurchaseCompletion?(silkBloomResult)
-            self.silkBloomPurchaseCompletion = nil
+            silkBloomCompletion?(silkBloomResult)
+        }
+    }
+
+    private func silkBloomReceiptDataString() -> String {
+        guard let silkBloomReceiptURL = Bundle.main.appStoreReceiptURL,
+              let silkBloomReceiptData = try? Data(contentsOf: silkBloomReceiptURL) else {
+            return ""
+        }
+
+        return silkBloomReceiptData.base64EncodedString()
+    }
+
+    private func silkBloomHandlePurchasedTransaction(
+        _ silkBloomTransaction: SKPaymentTransaction,
+        queue silkBloomQueue: SKPaymentQueue
+    ) {
+        let silkBloomProductID = silkBloomTransaction.payment.productIdentifier
+
+        guard let silkBloomProduct = silkBloomProductConfig(productID: silkBloomProductID) else {
+            silkBloomQueue.finishTransaction(silkBloomTransaction)
+            silkBloomFinishPurchase(productID: silkBloomProductID, result: .failed(message: "Product not found."))
+            return
+        }
+
+        if VelvetPoutAppStorage.velvetPoutIsB {
+            silkBloomHandleBPackagePurchasedTransaction(
+                silkBloomTransaction,
+                product: silkBloomProduct,
+                queue: silkBloomQueue
+            )
+            return
+        }
+
+        silkBloomQueue.finishTransaction(silkBloomTransaction)
+        MascaraMuseAdjustManager.shared.mascaraMuseTrackPurchase(dollar: silkBloomProduct.silkBloomPrice)
+        silkBloomFinishPurchase(
+            productID: silkBloomProductID,
+            result: .success(coins: silkBloomProduct.silkBloomCoinCount)
+        )
+    }
+
+    private func silkBloomHandleBPackagePurchasedTransaction(
+        _ silkBloomTransaction: SKPaymentTransaction,
+        product silkBloomProduct: SilkBloomRechargePackage,
+        queue silkBloomQueue: SKPaymentQueue
+    ) {
+        let silkBloomProductID = silkBloomTransaction.payment.productIdentifier
+        let silkBloomPurchaseID = silkBloomTransaction.transactionIdentifier ?? ""
+        let silkBloomVerificationData = silkBloomReceiptDataString()
+        let silkBloomOrderCode = silkBloomPendingOrderCodes[silkBloomProductID] ?? velvetPoutUsersOrderCode
+
+        Task {
+            do {
+                let silkBloomDidVerify = try await RougeSignalApiCall().rougeSignalPayCall(
+                    purchaseID: silkBloomPurchaseID,
+                    serverVerificationData: silkBloomVerificationData,
+                    orderCode: silkBloomOrderCode
+                )
+
+                await MainActor.run {
+                    silkBloomQueue.finishTransaction(silkBloomTransaction)
+
+                    if silkBloomDidVerify {
+                        MascaraMuseAdjustManager.shared.mascaraMuseTrackPurchase(dollar: silkBloomProduct.silkBloomPrice)
+                        self.silkBloomFinishPurchase(
+                            productID: silkBloomProductID,
+                            result: .success(coins: silkBloomProduct.silkBloomCoinCount)
+                        )
+                    } else {
+                        self.silkBloomFinishPurchase(
+                            productID: silkBloomProductID,
+                            result: .failed(message: "Purchase unverified.")
+                        )
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    silkBloomQueue.finishTransaction(silkBloomTransaction)
+                    self.silkBloomFinishPurchase(
+                        productID: silkBloomProductID,
+                        result: .failed(message: error.localizedDescription)
+                    )
+                }
+            }
         }
     }
 }
@@ -332,6 +425,9 @@ extension SilkBloomRechargeIAPManager: SKProductsRequestDelegate {
             self.silkBloomIsRequesting = false
             self.silkBloomRetryCount = 0
             self.silkBloomStoreProducts = response.products
+            self.silkBloomProductCache = Dictionary(
+                uniqueKeysWithValues: response.products.map { ($0.productIdentifier, $0) }
+            )
 
             if response.products.isEmpty {
                 self.silkBloomRetryFetch()
@@ -364,33 +460,27 @@ extension SilkBloomRechargeIAPManager: SKProductsRequestDelegate {
 extension SilkBloomRechargeIAPManager: SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for silkBloomTransaction in transactions {
+            let silkBloomProductID = silkBloomTransaction.payment.productIdentifier
+
             switch silkBloomTransaction.transactionState {
             case .purchased:
-                SKPaymentQueue.default().finishTransaction(silkBloomTransaction)
-
-                guard let silkBloomProduct = silkBloomProductConfig(
-                    productID: silkBloomTransaction.payment.productIdentifier
-                ) else {
-                    silkBloomFinishPurchase(.failed(message: "Product not found."))
-                    continue
-                }
-
-                silkBloomFinishPurchase(.success(coins: silkBloomProduct.silkBloomCoinCount))
+                silkBloomHandlePurchasedTransaction(silkBloomTransaction, queue: queue)
 
             case .failed:
-                SKPaymentQueue.default().finishTransaction(silkBloomTransaction)
+                queue.finishTransaction(silkBloomTransaction)
 
                 if let silkBloomError = silkBloomTransaction.error as? SKError,
                    silkBloomError.code == .paymentCancelled {
-                    silkBloomFinishPurchase(.cancelled)
+                    silkBloomFinishPurchase(productID: silkBloomProductID, result: .cancelled)
                 } else {
                     silkBloomFinishPurchase(
-                        .failed(message: silkBloomTransaction.error?.localizedDescription ?? "Unknown error.")
+                        productID: silkBloomProductID,
+                        result: .failed(message: silkBloomTransaction.error?.localizedDescription ?? "Unknown error.")
                     )
                 }
 
             case .restored:
-                SKPaymentQueue.default().finishTransaction(silkBloomTransaction)
+                queue.finishTransaction(silkBloomTransaction)
                 DispatchQueue.main.async {
                     self.silkBloomIsPurchasing = false
                 }
@@ -399,7 +489,7 @@ extension SilkBloomRechargeIAPManager: SKPaymentTransactionObserver {
                 break
 
             case .deferred:
-                silkBloomPurchaseCompletion?(.pending)
+                silkBloomFinishPurchase(productID: silkBloomProductID, result: .pending)
 
             @unknown default:
                 break

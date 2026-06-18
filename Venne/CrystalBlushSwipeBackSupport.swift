@@ -3,6 +3,8 @@ import UIKit
 import Combine
 
 struct CrystalBlushSwipeBackSupport: UIViewControllerRepresentable {
+    @ObservedObject var crystalBlushRouter: CrystalBlushAppRouter
+
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
@@ -14,18 +16,20 @@ struct CrystalBlushSwipeBackSupport: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
         DispatchQueue.main.async {
             guard let crystalBlushNavigationController = uiViewController.navigationController else { return }
+            context.coordinator.crystalBlushRouter = crystalBlushRouter
             context.coordinator.attach(to: crystalBlushNavigationController)
         }
     }
 
     final class Coordinator: NSObject, UIGestureRecognizerDelegate, UINavigationControllerDelegate {
         private weak var crystalBlushNavigationController: UINavigationController?
+        weak var crystalBlushRouter: CrystalBlushAppRouter?
 
         func attach(to crystalBlushNavigationController: UINavigationController) {
             self.crystalBlushNavigationController = crystalBlushNavigationController
             crystalBlushNavigationController.delegate = self
             crystalBlushNavigationController.interactivePopGestureRecognizer?.delegate = self
-            crystalBlushNavigationController.interactivePopGestureRecognizer?.isEnabled = true
+            crystalBlushNavigationController.interactivePopGestureRecognizer?.isEnabled = crystalBlushRouter?.crystalBlushCanSwipeBack ?? false
         }
 
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -34,6 +38,7 @@ struct CrystalBlushSwipeBackSupport: UIViewControllerRepresentable {
             }
 
             return (crystalBlushNavigationController?.viewControllers.count ?? 0) > 1
+                && (crystalBlushRouter?.crystalBlushCanSwipeBack ?? false)
         }
 
         func navigationController(
@@ -42,6 +47,7 @@ struct CrystalBlushSwipeBackSupport: UIViewControllerRepresentable {
             animated: Bool
         ) {
             navigationController.interactivePopGestureRecognizer?.isEnabled = navigationController.viewControllers.count > 1
+                && (crystalBlushRouter?.crystalBlushCanSwipeBack ?? false)
         }
     }
 }
@@ -52,4 +58,3 @@ private final class CrystalBlushSwipeBackHostController: UIViewController {
         view.backgroundColor = .clear
     }
 }
-

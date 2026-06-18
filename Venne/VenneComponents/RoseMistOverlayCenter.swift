@@ -15,6 +15,8 @@ struct RoseMistToastItem: Identifiable, Equatable {
 
 @MainActor
 final class RoseMistOverlayCenter: ObservableObject {
+    static let shared = RoseMistOverlayCenter()
+
     @Published var roseMistToastItem: RoseMistToastItem?
     @Published var roseMistIsLoading = false
     @Published var roseMistShowsLoadingMask = true

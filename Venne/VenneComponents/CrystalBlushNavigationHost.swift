@@ -41,7 +41,7 @@ private struct CrystalBlushRouteNode: View {
             .hidden()
         }
         .navigationBarHidden(true)
-        .background(CrystalBlushSwipeBackSupport())
+        .background(CrystalBlushSwipeBackSupport(crystalBlushRouter: crystalBlushRouter))
     }
 
     private var crystalBlushIsActiveBinding: Binding<Bool> {

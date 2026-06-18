@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DD819CA92FD94BD000D818F3 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DD819CA82FD94BD000D818F3 /* Alamofire */; };
+		DD819CAC2FD94BDF00D818F3 /* AdjustSdk in Frameworks */ = {isa = PBXBuildFile; productRef = DD819CAB2FD94BDF00D818F3 /* AdjustSdk */; };
+		DD819CAF2FD94D7300D818F3 /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = DD819CAE2FD94D7300D818F3 /* FacebookAEM */; };
+		DD819CB12FD94D7300D818F3 /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = DD819CB02FD94D7300D818F3 /* FacebookBasics */; };
+		DD819CB32FD94D7300D818F3 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = DD819CB22FD94D7300D818F3 /* FacebookCore */; };
+		DD819CB62FD94DCA00D818F3 /* ScreenShield in Frameworks */ = {isa = PBXBuildFile; productRef = DD819CB52FD94DCA00D818F3 /* ScreenShield */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		DDA05DAC2FADDA4B007FA525 /* Venne.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Venne.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +45,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD819CAF2FD94D7300D818F3 /* FacebookAEM in Frameworks */,
+				DD819CB32FD94D7300D818F3 /* FacebookCore in Frameworks */,
+				DD819CB12FD94D7300D818F3 /* FacebookBasics in Frameworks */,
+				DD819CAC2FD94BDF00D818F3 /* AdjustSdk in Frameworks */,
+				DD819CA92FD94BD000D818F3 /* Alamofire in Frameworks */,
+				DD819CB62FD94DCA00D818F3 /* ScreenShield in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +93,12 @@
 			);
 			name = Venne;
 			packageProductDependencies = (
+				DD819CA82FD94BD000D818F3 /* Alamofire */,
+				DD819CAB2FD94BDF00D818F3 /* AdjustSdk */,
+				DD819CAE2FD94D7300D818F3 /* FacebookAEM */,
+				DD819CB02FD94D7300D818F3 /* FacebookBasics */,
+				DD819CB22FD94D7300D818F3 /* FacebookCore */,
+				DD819CB52FD94DCA00D818F3 /* ScreenShield */,
 			);
 			productName = Venne;
 			productReference = DDA05DAC2FADDA4B007FA525 /* Venne.app */;
@@ -107,6 +128,12 @@
 			);
 			mainGroup = DDA05DA32FADDA4B007FA525;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DD819CA72FD94BD000D818F3 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				DD819CAA2FD94BDF00D818F3 /* XCRemoteSwiftPackageReference "ios_sdk" */,
+				DD819CAD2FD94D7300D818F3 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
+				DD819CB42FD94DCA00D818F3 /* XCRemoteSwiftPackageReference "ScreenShield" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DDA05DAD2FADDA4B007FA525 /* Products */;
 			projectDirPath = "";
@@ -252,7 +279,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_COMPILATION_MODE = incremental;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -262,6 +290,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Venne/Venne.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -284,7 +313,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.venaixveribxcw.Venne;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -293,6 +322,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -304,6 +334,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Venne/Venne.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -326,7 +357,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.venaixveribxcw.Venne;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -363,6 +394,74 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DD819CA72FD94BD000D818F3 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.12.0;
+			};
+		};
+		DD819CAA2FD94BDF00D818F3 /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/adjust/ios_sdk.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		DD819CAD2FD94D7300D818F3 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		DD819CB42FD94DCA00D818F3 /* XCRemoteSwiftPackageReference "ScreenShield" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JayantBadlani/ScreenShield.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DD819CA82FD94BD000D818F3 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD819CA72FD94BD000D818F3 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		DD819CAB2FD94BDF00D818F3 /* AdjustSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD819CAA2FD94BDF00D818F3 /* XCRemoteSwiftPackageReference "ios_sdk" */;
+			productName = AdjustSdk;
+		};
+		DD819CAE2FD94D7300D818F3 /* FacebookAEM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD819CAD2FD94D7300D818F3 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookAEM;
+		};
+		DD819CB02FD94D7300D818F3 /* FacebookBasics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD819CAD2FD94D7300D818F3 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookBasics;
+		};
+		DD819CB22FD94D7300D818F3 /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD819CAD2FD94D7300D818F3 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+		DD819CB52FD94DCA00D818F3 /* ScreenShield */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD819CB42FD94DCA00D818F3 /* XCRemoteSwiftPackageReference "ScreenShield" */;
+			productName = ScreenShield;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DDA05DA42FADDA4B007FA525 /* Project object */;
 }

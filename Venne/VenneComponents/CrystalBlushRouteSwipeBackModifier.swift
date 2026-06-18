@@ -13,7 +13,7 @@ struct CrystalBlushRouteSwipeBackModifier: ViewModifier {
                 Color.clear
                     .frame(width: crystalBlushEdgeWidth)
                     .contentShape(Rectangle())
-                    .allowsHitTesting(crystalBlushRouter.crystalBlushCanPop)
+                    .allowsHitTesting(crystalBlushRouter.crystalBlushCanSwipeBack)
                     .gesture(
                         DragGesture(minimumDistance: 18, coordinateSpace: .global)
                             .onEnded { crystalBlushValue in
@@ -25,7 +25,7 @@ struct CrystalBlushRouteSwipeBackModifier: ViewModifier {
     }
 
     private func crystalBlushHandleSwipe(_ crystalBlushValue: DragGesture.Value) {
-        guard crystalBlushRouter.crystalBlushCanPop else { return }
+        guard crystalBlushRouter.crystalBlushCanSwipeBack else { return }
 
         let crystalBlushHorizontalMove = crystalBlushValue.translation.width
         let crystalBlushVerticalMove = abs(crystalBlushValue.translation.height)

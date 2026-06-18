@@ -79,6 +79,22 @@ struct HoneyLuxePrivateChatRoomView: View {
             if honeyLuxeCanShowMoreButton {
                 Button {
                     PeachMistGuestAccessGuard.peachMistRequireMemberAccess(overlayCenter: roseMistOverlayCenter) {
+                        honeyLuxeRouter?.push(.pearlLuxeVideoCall(roomID: honeyLuxeRoomID))
+                    }
+                } label: {
+                    Circle()
+                        .fill(Color.white.opacity(0.55))
+                        .frame(width: 52, height: 52)
+                        .overlay(
+                            Image(systemName: "video.fill")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(GlowMuseTheme.honeyGlowLinkText)
+                        )
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    PeachMistGuestAccessGuard.peachMistRequireMemberAccess(overlayCenter: roseMistOverlayCenter) {
                         honeyLuxeShowsModerationSheet = true
                     }
                 } label: {
@@ -90,7 +106,7 @@ struct HoneyLuxePrivateChatRoomView: View {
                 .buttonStyle(.plain)
             } else {
                 Color.clear
-                    .frame(width: 52, height: 52)
+                    .frame(width: 112, height: 52)
             }
         }
         .padding(.top, 60)
