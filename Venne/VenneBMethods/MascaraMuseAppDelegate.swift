@@ -50,10 +50,23 @@ final class MascaraMuseAdjustManager: NSObject, AdjustDelegate {
         Adjust.trackEvent(mascaraMuseInstallEvent)
     }
 
-    func mascaraMuseTrackPurchase(dollar: Double) {
+    func mascaraMuseTrackPurchase(dollar mascaraMuseDollar: Double) {
+        mascaraMuseTrackAdjustPurchase(dollar: mascaraMuseDollar)
+        mascaraMuseTrackFacebookPurchase(price: mascaraMuseDollar)
+    }
+
+    private func mascaraMuseTrackAdjustPurchase(dollar mascaraMuseDollar: Double) {
         let mascaraMusePurchaseEvent = ADJEvent(eventToken: mascaraMusePurchaseToken)
-        mascaraMusePurchaseEvent?.setRevenue(dollar, currency: "USD")
+        mascaraMusePurchaseEvent?.setRevenue(mascaraMuseDollar, currency: "USD")
         Adjust.trackEvent(mascaraMusePurchaseEvent)
+    }
+
+    private func mascaraMuseTrackFacebookPurchase(price mascaraMusePrice: Double) {
+        AppEvents.shared.logPurchase(
+            amount: mascaraMusePrice,
+            currency: "USD",
+            parameters: [AppEvents.ParameterName(rawValue: "fb_mobile_purchase"): "true"]
+        )
     }
 }
 

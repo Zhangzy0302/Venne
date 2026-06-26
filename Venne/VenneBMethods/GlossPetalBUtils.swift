@@ -111,7 +111,7 @@ class GlossPetalInformationCreate {
     static let glossPetalAppVersion: String = "1.1.0"
     
     static let glossPetalVerifyDate: DateComponents = DateComponents(
-        year: 2026, month: 6, day: 24, hour: 12
+        year: 2026, month: 6, day: 28, hour: 12
       )
 
   static func glossPetalBuildH5Url(baseUrl glossPetalBaseUrl: String, token glossPetalToken: String) -> String {
